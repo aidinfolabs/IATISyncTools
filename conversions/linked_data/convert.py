@@ -1,9 +1,5 @@
 import sys, os, fnmatch
 from lxml import etree
-from rdflib.parser import StringInputSource
-from rdflib.compare import to_isomorphic, graph_diff
-from rdflib import Graph
-from rdfchangesets import ChangeSet, BatchChangeSet
 
 # Set up key variables
 script_path = os.path.dirname(os.path.realpath(__file__))
@@ -30,7 +26,7 @@ def process_file(file):
         rdf = transform(xml)
         fileName, fileExtension = os.path.splitext(file)
         f = open(fileName + '.rdf','w')
-        f.write(rdf)
+        f.write(str(rdf))
         f.close() 
     except Exception, e:
         print "Error processing file "+ file
