@@ -88,6 +88,9 @@ def flatten_dataset_details(dataset):
 			flattened[key] = str(dataset[key][0])
 		else:
 			flattened[key] = dataset[key]
+
+	if not flattened.get('groups'):
+		flattened['groups'] = 'none'
 	return flattened
 	
 
