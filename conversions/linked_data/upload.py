@@ -29,7 +29,7 @@ def process_file(fileName):
 				print "Operation complete. Response status " + str(response.status)
 
 				try:
-
+					#Add to the data data here
 					metaRDF = Graph()
 					metaRDF.bind("dc", "http://purl.org/dc/elements/1.1/")
 					DC = Namespace("http://purl.org/dc/elements/1.1/")
@@ -45,13 +45,14 @@ def process_file(fileName):
 						pass
 					
 					try:
-						print "Storing data " +  metaData['name']
-						response = store.add_graph(graph_name + '/meta',metaRDF.serialize(),"xml")
-						print "Operation complete. Response status " + str(response.status)
+						print "Storing meta data for " +  metaData['name']
+						response = store.append_graph(graph_name,metaRDF.serialize(),"xml")
+						print "Metadata operation complete. Response status " + str(response.status)
+						print
 					except:
 						print "Error storing meta data graph."
 				except Exception:
-					print "Trouble generating metadata graph" + 
+					print "Trouble generating metadata graph" 
 
 			except:
 				print "Trouble storing data"
