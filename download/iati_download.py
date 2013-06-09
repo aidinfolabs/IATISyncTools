@@ -10,9 +10,9 @@ import types
 from urlparse import urlparse
 import re
 
-def registry_fetch(api_endpoint, *parameters): #To return an object full of all the data. Needs to handle query building and 
+def registry_fetch(api_endpoint, *parameters): #To return an list of datasets
 	query = string.join(parameters,'&')
-	url = api_endpoint + 'search/dataset?' + query + '&limit=100&all_fields=1&offset='
+	url = api_endpoint + 'search/dataset?' + query + '&limit=100&offset='
 	all_fetched = 0
 	offset = 0
 	dataset_list = []
@@ -44,16 +44,23 @@ def registry_fetch(api_endpoint, *parameters): #To return an object full of all 
 	return dataset_list
 
 
-def resource_fetch(dataset_list,directory_pattern = 'datasets/$groups',file_pattern='$name.xml',comparison_method = 'dataset_meta',store_metadata=True):
-	for dataset in dataset_list:
-		for resource in dataset['res_url']:
+def resource_fetch(api_endpoint,dataset_list,directory_pattern = 'datasets/$groups',file_pattern='$name.xml',comparison_method = 'dataset_meta',store_metadata=True):
+	for listing in dataset_list:
+		if debug_level > 3:
+			print "Fetching full record for: "+ str(listing)
+		api_connection = urllib.urlopen(api_endpoint + 'rest/dataset/' + str(listing))
+		dataset = json.loads(api_connection.read())
+
+		
+		for resource_details in dataset['resources']:
+			resource = resource_details['url']
 			flat_dataset = flatten_dataset_details(dataset)
 			directory = string.Template(directory_pattern).substitute(flat_dataset)
 			filename = string.Template(file_pattern).substitute(flat_dataset)
-		
+	
 			#ToDo: Add lots of error handling and reporting
 			check_dir(directory)
-  		
+
 			try:
 				if check_resource(dataset,resource,directory + '/' + filename,comparison_method):
 					if debug_level > 3:
@@ -85,7 +92,10 @@ def flatten_dataset_details(dataset):
 		 	for extra_key in dataset['extras']:
 		 		flattened[extra_key] = dataset['extras'][extra_key]
 		elif type(dataset[key]) == types.ListType:
-			flattened[key] = str(dataset[key][0])
+			try: #See if it is a numerical list
+				flattened[key] = str(dataset[key][0])
+			except:
+				pass
 		else:
 			flattened[key] = dataset[key]
 
@@ -253,12 +263,12 @@ if __name__ == '__main__':
 	if(args.verbosity):
 		debug_level = args.verbosity
 	else:
-		verbosity = 3
+		debug_level = 4
 
+	api_endpoint = 'http://www.iatiregistry.org/api/'
+	dataset_list = registry_fetch(api_endpoint,filetype,search,groups,country)
 
-	dataset_list = registry_fetch('http://www.iatiregistry.org/api/',filetype,search,groups,country)
-
-	resource_fetch(dataset_list,directory_pattern,file_pattern,comparison,metadata)
+	resource_fetch(api_endpoint,dataset_list,directory_pattern,file_pattern,comparison,metadata)
     
 #    
 #    import sys
