@@ -64,7 +64,7 @@ def resource_fetch(dataset_list,directory_pattern = 'datasets/$groups',file_patt
 					webFile.close()
 					if store_metadata:
 						metaFileName, metaFileExtension = os.path.splitext(directory + '/' + filename) 
-						metaFile = open(metaFileName + '.meta.json','w')
+						metaFile = open(metaFileName + '.json','w')
 						metaFile.write(json.dumps(dataset))
 						metaFile.close
 						if debug_level > 4:
