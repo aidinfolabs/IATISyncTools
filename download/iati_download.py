@@ -229,7 +229,7 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	if(args.parameter_filetype):
-		filetype=args.parameter_filetype
+		filetype='filetype='+args.parameter_filetype
 	else:
 		filetype=''
 	if(args.parameter_group):
